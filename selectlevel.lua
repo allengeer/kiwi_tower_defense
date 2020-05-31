@@ -1,6 +1,8 @@
 local composer = require( "composer" )
 local display = require("display")
 local global = require("global")
+local TD_model = require("TD_model")
+local utils = require("utils")
 local scene = composer.newScene()
  
 -- -----------------------------------------------------------------------------------
@@ -35,10 +37,27 @@ function scene:show( event )
    
     background:setFillColor(0)
 
-    local displayText = display.newText(backgroundGroup,"Select Level", 0, 20)
+    -- local displayText = display.newText(backgroundGroup,"Select Level", 0, 20)
     
-    displayText.anchorX=0
-    displayText.anchorY=0
+    -- displayText.anchorX=0
+    -- displayText.anchorY=0
+    utils.createText(backgroundGroup, "Episodes. . .", {0, 20})
+    
+    local buttons = {} 
+    for i,v in ipairs(TD_model.episodes) do
+        local button = utils.createButton(backgroundGroup, v.name, {10, i*60}, function (e) print (v.name .. " clicked" ) end)
+        button.anchorY = 0
+        button.anchorX = 0
+        table.insert(buttons, button)
+
+        for j=0,v.levels,1
+        do
+            local button = utils.createButton(backgroundGroup,j+1, {j*20 + 10, i*60+30}, function (e) print (v.name .. j .. " clicked" ) end)
+            button.anchorY = 0
+            button.anchorX = 0
+            table.insert(buttons, button)
+        end
+    end
 
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)

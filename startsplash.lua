@@ -1,7 +1,7 @@
 local composer = require( "composer" )
 local display = require("display")
-local colcov = require("convertcolor")
 local global = require("global")
+local utils = require("utils")
 local scene = composer.newScene()
  
 -- -----------------------------------------------------------------------------------
@@ -10,11 +10,7 @@ local scene = composer.newScene()
 -- -----------------------------------------------------------------------------------
  
  -- Tap listener function
-local function playListener( event )
-    local object = event.target
-    print("TAP")
-    composer.gotoScene("selectlevel")
-end
+
  
  
 -- -----------------------------------------------------------------------------------
@@ -40,7 +36,7 @@ function scene:show( event )
     local background = display.newRect(backgroundGroup,display.contentCenterX, display.contentCenterY,display.contentWidth,display.contentHeight)
     local backgroundGradient = {
         type="gradient",
-        color1={colcov.rgb(130,69,25)}, 
+        color1={utils.rgb(130,69,25)}, 
         color2={ 0 }, 
         direction="down"
     }
@@ -51,8 +47,16 @@ function scene:show( event )
     displayText.anchorX=0
     displayText.anchorY=0
 
-    local playbutton = display.newText(backgroundGroup, "Play Now", display.contentCenterX, display.contentCenterY)
-    playbutton:addEventListener("tap", playListener)
+    local playbutton utils.createButton (
+        backgroundGroup, 
+        "Play Now", 
+        {display.contentCenterX, display.contentCenterY}, 
+        function ( event )
+            local object = event.target
+            composer.gotoScene("selectlevel")
+        end
+    )
+  
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
        
