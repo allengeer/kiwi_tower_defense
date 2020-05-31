@@ -3,8 +3,8 @@ local TD_model = require ("TD_model")
 
 TestModel = {}
 	function TestModel:testEpisodes()
-		lu.assertIsTable(TD_model.episodes)
-		lu.assertTrue(table.getn(TD_model.episodes))
+		lu.assertIsTable(TD_model.episodes, "Episode table not there")
+		lu.assertTrue(#TD_model.episodes > 0, "No Episodes in Episode Table")
 	end
 
 
