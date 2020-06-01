@@ -43,11 +43,18 @@ function createText (group, text, location)
     return displayText
 end
 
-function createButton (group, text, location, handler)
-
-	local button = display.newText(text, location[1], location[2])
-    
-
+function createButton (group, text, location, handler, buttonSize)
+	buttonSize = buttonSize or 28
+	local button = display.newText(
+	    {
+	    	text = text,
+	    	x = location[1],
+	    	y = location[2],
+	    	font = "Arial",
+	    	fontSize = buttonSize,
+	    	align = "center"
+	    }
+    )
     local paint = {
 	    type = "gradient",
 	    color1 = { 0, .25, 0 },
@@ -55,11 +62,36 @@ function createButton (group, text, location, handler)
 	    direction = "down"
 	}
 	 
-	local rect = display.newRect( group, location[1], location[2], button.contentWidth+40, button.contentHeight+10 )
+	local rect = display.newRoundedRect( group, location[1], location[2], button.contentWidth+40, button.contentHeight+10, 10 )
 	rect.fill = paint
 	rect:addEventListener("tap", handler)
 	group:insert(button)
 
     return button
+end
+
+function hasCollidedCircle( obj1, obj2 )
+ 
+
+    if ( obj1 == nil ) then  -- Make sure the first object exists
+        return false
+    end
+    if ( obj2 == nil ) then  -- Make sure the other object exists
+        return false
+    end
+ 
+ 	obj2.contentWidth = obj2.contentWidth or obj1.contentWidth
+ 	obj2.contentHeight = obj2.contentHeight or obj1.contentHeight
+ 	
+    local dx = obj1.x - obj2.x
+    local dy = obj1.y - obj2.y
+ 
+    local distance = math.sqrt( dx*dx + dy*dy )
+    local objectSize = (obj2.contentWidth/2) + (obj1.contentWidth/2)
+ 
+    if ( distance < objectSize ) then
+        return true
+    end
+    return false
 end
 return P

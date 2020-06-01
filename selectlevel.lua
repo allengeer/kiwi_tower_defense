@@ -41,9 +41,18 @@ function scene:show( event )
     
     local buttons = {} 
     for i,v in ipairs(TD_model.episodes) do
-        local button = utils.createButton(sceneGroup, v.name, {80, i*120}, function (e) print (v.name .. " clicked" ) end)
+        local episode = display.newText({
+            parent = sceneGroup,
+            text = v.name,
+            x = 80,
+            y = i*120,
+            font = "Arial",
+            fontSize = 30,
+            align = "left"
+        })
+        -- local button = utils.createButton(sceneGroup, v.name, {80, i*120}, function (e) print (v.name .. " clicked" ) end)
     
-        table.insert(buttons, button)
+        -- table.insert(buttons, button)
 
         for j=1,#v.levels,1
         do
@@ -54,7 +63,8 @@ function scene:show( event )
                     TD_model.activeLevel = j
                     composer.gotoScene("play")
                     return true
-                end
+                end,
+                60
                 )
             table.insert(buttons, button)
         end
