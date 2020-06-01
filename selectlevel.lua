@@ -32,29 +32,30 @@ function scene:show( event )
     local sceneGroup = self.view
     local phase = event.phase
  
-    local backgroundGroup = display.newGroup(sceneGroup)
-    local background = display.newRect(backgroundGroup,display.contentCenterX, display.contentCenterY,display.contentWidth,display.contentHeight)
+    local background = display.newRect(sceneGroup,display.contentCenterX, display.contentCenterY,display.contentWidth,display.contentHeight)
    
     background:setFillColor(0)
 
-    -- local displayText = display.newText(backgroundGroup,"Select Level", 0, 20)
-    
-    -- displayText.anchorX=0
-    -- displayText.anchorY=0
-    utils.createText(backgroundGroup, "Episodes. . .", {0, 20})
+   
+    utils.createText(sceneGroup, "Select Level", {30, 50})
     
     local buttons = {} 
     for i,v in ipairs(TD_model.episodes) do
-        local button = utils.createButton(backgroundGroup, v.name, {10, i*60}, function (e) print (v.name .. " clicked" ) end)
-        button.anchorY = 0
-        button.anchorX = 0
+        local button = utils.createButton(sceneGroup, v.name, {80, i*120}, function (e) print (v.name .. " clicked" ) end)
+    
         table.insert(buttons, button)
 
-        for j=0,v.levels,1
+        for j=1,#v.levels,1
         do
-            local button = utils.createButton(backgroundGroup,j+1, {j*20 + 10, i*60+30}, function (e) print (v.name .. j .. " clicked" ) end)
-            button.anchorY = 0
-            button.anchorX = 0
+            local button = utils.createButton(sceneGroup,j, {j*100 + 90 + j*4, i*120+60}, 
+                function (e) 
+                    print (v.name .. j .. " clicked" ) 
+                    TD_model.activeEpisode = i
+                    TD_model.activeLevel = j
+                    composer.gotoScene("play")
+                    return true
+                end
+                )
             table.insert(buttons, button)
         end
     end

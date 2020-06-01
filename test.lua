@@ -7,5 +7,4 @@ TestModel = {}
 		lu.assertTrue(#TD_model.episodes > 0, "No Episodes in Episode Table")
 	end
 
-
 os.exit( lu.LuaUnit.run() )

@@ -44,8 +44,21 @@ function createText (group, text, location)
 end
 
 function createButton (group, text, location, handler)
-	local button = display.newText(group, text, location[1], location[2])
-    button:addEventListener("tap", handler)
+
+	local button = display.newText(text, location[1], location[2])
+    
+
+    local paint = {
+	    type = "gradient",
+	    color1 = { 0, .25, 0 },
+	    color2 = { 0, .1, 0 },
+	    direction = "down"
+	}
+	 
+	local rect = display.newRect( group, location[1], location[2], button.contentWidth+40, button.contentHeight+10 )
+	rect.fill = paint
+	rect:addEventListener("tap", handler)
+	group:insert(button)
 
     return button
 end

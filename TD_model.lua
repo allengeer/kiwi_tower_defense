@@ -6,8 +6,20 @@ else
   _G[_REQUIREDNAME] = P
 end
 
-P.episodes = { { name = "COVID-19", levels=3 },
-			 { name = "Predators", levels=5 },
-			 { name = "Aussies", levels=4 } }
+P.activeEpisode = nil
+P.activeLevel = nil
 
+P.episodes = { { name  = "COVID-19", 
+				levels = { 
+					{
+						name = "Level 1",
+						enemies = "1111X1111"
+					},
+				} 
+			} }
+
+function getCurrentLevel () 
+	return (P.episodes[P.activeEpisode]).levels[P.activeLevel]
+end
+P.getCurrentLevel = getCurrentLevel
 return P
