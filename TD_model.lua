@@ -15,6 +15,10 @@ P.episodes = { { name  = "COVID-19",
 						name = "Level 1",
 						enemies = "1111X1111"
 					},
+					{
+						name = "Level 2",
+						enemies = "1X11X11"
+					},
 				} 
 			} }
 

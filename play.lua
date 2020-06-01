@@ -15,18 +15,17 @@ local actorsSheetInfo = require("images.actors")
 local actorsSheet = graphics.newImageSheet( "images/actors.png", actorsSheetInfo:getSheet() )
 local enemiesGroup
 
-local enemies = { } 
-local gameTime = 0 
-local currentLevel = TD_model:getCurrentLevel()
+local enemies
+local gameTime 
+local currentLevel
 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
 function gameLoop ()
     gameTime = gameTime + 50
-
+    local enemyIndex = gameTime / 1000
     if gameTime % 1000 == 0 then
-        enemyIndex = gameTime / 1000
         if enemyIndex <= #currentLevel.enemies then
             if string.sub(currentLevel.enemies, enemyIndex, enemyIndex) ~= "X" then
                 local covid = display.newImage(enemiesGroup, actorsSheet, actorsSheetInfo:getFrameIndex("Capsid"), 20, display.contentCenterY)
@@ -43,6 +42,11 @@ function gameLoop ()
             table.remove( enemies, i )
         end
     end
+
+    if enemyIndex > #currentLevel.enemies and #enemies == 0 then
+        composer.gotoScene("selectlevel")
+    end
+
 
 end
 
@@ -70,12 +74,14 @@ function scene:show( event )
     -- local covid = display.newImage(sceneGroup, actorsSheet, actorsSheetInfo:getFrameIndex("Capsid"), 100, display.contentCenterY)
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
- 
+        enemies = { } 
+        gameTime = 0 
+        currentLevel = TD_model:getCurrentLevel()
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
         physics.start()
         Runtime:addEventListener( "collision", onCollision )
-        gameLoopTimer = timer.performWithDelay( 50, gameLoop, 0 )
+        gameLoopTimer = timer.performWithDelay( 25, gameLoop, 0 )
     end
 end
  
