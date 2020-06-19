@@ -56,7 +56,7 @@ function scene:show( event )
 
         for j=1,#v.levels,1
         do
-            local button = utils.createButton(sceneGroup,j, {j*100 + 90 + j*4, i*120+60}, 
+            local button = utils.createButton(sceneGroup,j, {j%5*100 + 90 + j*4, i*120+100*math.floor(j/5)}, 
                 function (e) 
                     print (v.name .. j .. " clicked" ) 
                     TD_model.activeEpisode = i

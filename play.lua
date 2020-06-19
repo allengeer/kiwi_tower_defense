@@ -1,5 +1,5 @@
 local composer = require( "composer" )
- 
+local physics = require( "physics" )
 local scene = composer.newScene()
 local display = require("display")
 local global = require("global")
@@ -10,7 +10,9 @@ local utils = require("utils")
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
- 
+local pathLength
+local pathRate
+
 local actorsSheetInfo = require("images.actors")
 local actorsSheet = graphics.newImageSheet( "images/actors.png", actorsSheetInfo:getSheet() )
 local enemiesGroup
@@ -21,7 +23,6 @@ local laserGroup
 local enemies
 local defenses
 local gameTime 
-local currentLevel
 
 -- EVENT Handlers
 
@@ -68,18 +69,52 @@ local function aquireTarget ( defense )
     return best
 end
 
+local function distance (pt1, pt2) 
+    return math.sqrt( (pt2[1] - pt1[1]) * (pt2[1] - pt1[1]) + (pt2[2] - pt1[2]) * (pt2[2] - pt1[2]) )
+end
+
+local function setVelocity( defense )
+    
+    local deltax = TD_model:getCurrentLevel().path[defense.destinationIndex][1]-defense.x
+    local deltay = TD_model:getCurrentLevel().path[defense.destinationIndex][2]-defense.y
+
+    local distanceLeg = distance(TD_model:getCurrentLevel().path[defense.destinationIndex], {defense.x, defense.y})
+    local legTime = distanceLeg / pathRate
+    defense:setLinearVelocity(deltax / legTime, deltay / legTime)
+end
+
+
+
+local function totalPathDistance( path )
+    local total = 0
+    for i = 2,#path do
+        total = total + distance(path[i], path[i-1])
+    end
+    return total
+end
+
+local function enemyDie( enemy ) 
+
+end
+
+local function enemyScore( enemy ) 
+
+end
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
 function gameLoop ()
     gameTime = gameTime + 50
-    local enemyIndex = gameTime / 1000
-    if gameTime % 1000 == 0 then
-        if enemyIndex <= #currentLevel.enemies then
-            if string.sub(currentLevel.enemies, enemyIndex, enemyIndex) ~= "X" then
-                local covid = display.newImage(enemiesGroup, actorsSheet, actorsSheetInfo:getFrameIndex("Capsid"), 20, display.contentCenterY)
+    local enemyIndex = gameTime / 2000
+    if gameTime % 2000 == 50 then
+        if enemyIndex <= #TD_model:getCurrentLevel().enemies then
+            if string.sub(TD_model:getCurrentLevel().enemies, enemyIndex, enemyIndex) ~= "X" then
+                local covid = display.newImage(enemiesGroup, actorsSheet, actorsSheetInfo:getFrameIndex("Capsid"), TD_model:getCurrentLevel().path[1][1], TD_model:getCurrentLevel().path[1][2])
                 covid.health = 100
+                covid.destinationIndex = 2
                 table.insert(enemies, covid)
+                physics.addBody( covid, "kinematic", {  } )
+                setVelocity(covid)
             end
         end
     end
@@ -87,14 +122,17 @@ function gameLoop ()
     for i,v in ipairs(enemies) do
         if v.health <= 0 then
             v:removeSelf()
+            enemyDie(v)
             table.remove(enemies,i)
-        else
-            v:translate(5,0)
+        elseif v.x - v.contentWidth/2 > display.contentWidth then
+            v:removeSelf()
+            enemyScore(v)
+            table.remove( enemies, i )
+        end
 
-            if v.x - v.contentWidth/2 > display.contentWidth then
-                v:removeSelf()
-                table.remove( enemies, i )
-            end
+        if v.destinationIndex < #TD_model:getCurrentLevel().path and distance({v.x, v.y}, TD_model:getCurrentLevel().path[v.destinationIndex]) < 10 then
+            v.destinationIndex = v.destinationIndex + 1
+            setVelocity(v)
         end
     end
     if gameTime % 125 == 0 then
@@ -113,7 +151,7 @@ function gameLoop ()
         end
     end
 
-    if enemyIndex > #currentLevel.enemies and #enemies == 0 then
+    if enemyIndex > #TD_model:getCurrentLevel().enemies and #enemies == 0 then
         composer.gotoScene("selectlevel")
     end
 
@@ -144,9 +182,8 @@ function scene:create( event )
  
     local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
-    local background = display.newImage(sceneGroup, "images/Level 1.png", display.contentCenterX, display.contentCenterY)
-    background:addEventListener("touch", onBackgroundTouch)
-    uiGroup = display.newGroup(sceneGroup)
+
+    
 end
  
  
@@ -159,6 +196,15 @@ function scene:show( event )
     -- local kiwi = display.newImage(sceneGroup, actorsSheet, actorsSheetInfo:getFrameIndex("Kiwi"), display.contentCenterX, display.contentCenterY)
     -- local covid = display.newImage(sceneGroup, actorsSheet, actorsSheetInfo:getFrameIndex("Capsid"), 100, display.contentCenterY)
     if ( phase == "will" ) then
+        local maploc = "images/" .. TD_model:getCurrentEpisode().prefix .. "/" .. TD_model:getCurrentLevel().name .. ".png"
+
+        local background = display.newImage(sceneGroup, maploc, display.contentCenterX, display.contentCenterY)
+        background:addEventListener("touch", onBackgroundTouch)
+        uiGroup = display.newGroup(sceneGroup)
+        
+        pathLength = totalPathDistance( TD_model:getCurrentLevel().path )
+        pathRate = pathLength / TD_model:getCurrentLevel().levelTime
+
         -- Code here runs when the scene is still off screen (but is about to come on screen)
          laserGroup = display.newGroup(sceneGroup)
         enemiesGroup = display.newGroup(sceneGroup)
@@ -167,7 +213,9 @@ function scene:show( event )
         enemies = { } 
         defenses = { }
         gameTime = 0 
-        currentLevel = TD_model:getCurrentLevel()
+
+        physics.start()
+
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
         -- physics.start()
