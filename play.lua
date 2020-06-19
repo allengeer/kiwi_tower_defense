@@ -42,7 +42,7 @@ local function fireLaserBeam ( defense, target )
         if not defense.laser then
             local laser = display.newLine( laserGroup, defense.x-7, defense.y-27, target.x, target.y )
             laser:setStrokeColor( 0, 1, 0 )
-            laser.strokeWidth = 5
+            laser.strokeWidth = 2
             defense.laser = laser
             target.health = target.health - 10
             if target.health <= 0 then
@@ -105,7 +105,7 @@ end
 -- -----------------------------------------------------------------------------------
 function gameLoop ()
     gameTime = gameTime + 50
-    local enemyIndex = gameTime / 2000
+    local enemyIndex = (gameTime+50) / 2000
     if gameTime % 2000 == 50 then
         if enemyIndex <= #TD_model:getCurrentLevel().enemies then
             if string.sub(TD_model:getCurrentLevel().enemies, enemyIndex, enemyIndex) ~= "X" then

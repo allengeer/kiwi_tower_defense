@@ -9,7 +9,7 @@ application =
 	{
 		width = 640, --1280
 		height = 960, --1920
-		scale = "zoomEven",
+		scale = "letterbox",
 		fps = 60,
 		
 		
