@@ -128,9 +128,7 @@ function gameLoop ()
             v:removeSelf()
             enemyScore(v)
             table.remove( enemies, i )
-        end
-
-        if v.destinationIndex < #TD_model:getCurrentLevel().path and distance({v.x, v.y}, TD_model:getCurrentLevel().path[v.destinationIndex]) < 10 then
+        elseif v.destinationIndex < #TD_model:getCurrentLevel().path and distance({v.x, v.y}, TD_model:getCurrentLevel().path[v.destinationIndex]) < 10 then
             v.destinationIndex = v.destinationIndex + 1
             setVelocity(v)
         end
